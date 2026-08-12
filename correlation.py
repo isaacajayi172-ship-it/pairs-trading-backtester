@@ -50,6 +50,7 @@ print(data["signal"].value_counts())
 
 position = None      # comment: are we currently in a trade? None = no, otherwise store entry details
 trades = []             # comment: will collect one record per completed trade
+capital_gained_per_trade = 10000
 
 for i in range(len(data)):
     z = data["z_score"].iloc[i]
@@ -57,17 +58,22 @@ for i in range(len(data)):
 
     if position is None:
         if z > 2:
-            position = {"entry_date": date, "entry_z": z, "type": "SELL MA / BUY V"}
+            position = {"entry_date": date, "entry_z": z, "entry_ratio": data["ratio"].iloc[i], "type": "SELL MA / BUY V"}
         elif z < -2:
-            position = {"entry_date": date, "entry_z": z, "type": "BUY MA / SELL V"}
+            position = {"entry_date": date, "entry_z": z, "entry_ratio": data["ratio"].iloc[i], "type": "BUY MA / SELL V"}
     else:
         if abs(z) < 0.5:
             profit = abs(position["entry_z"]) - abs(z)
+
+            exit_ratio = data["ratio"].iloc[i]
+            pct_return = abs(position["entry_ratio"] - exit_ratio) / position["entry_ratio"]
+            profit_in_dollars = pct_return * capital_gained_per_trade
+
             trades.append({
                 "entry_date": position["entry_date"],
                 "exit_date": date,
                 "type": position["type"],
-                "profit": profit
+                "profit_in_dollars": profit_in_dollars
             })
             position = None
 
@@ -76,9 +82,12 @@ for t in trades:
     print(t)
 
 
-total_profit = sum(t["profit"] for t in trades)
+total_profit = sum(t["profit_in_dollars"] for t in trades)
 print("Total profit:", total_profit)
 
-winning_trades = [t for t in trades if t["profit"] > 0]
+winning_trades = [t for t in trades if t["profit_in_dollars"] > 0]
 win_rate = len(winning_trades) / len(trades)
 print("Win rate:", win_rate)
+
+
+print(sum(t["profit_in_dollars"] for t in trades))
