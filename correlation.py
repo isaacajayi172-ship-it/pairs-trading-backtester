@@ -48,9 +48,9 @@ data["signal"] = signals
 
 print(data["signal"].value_counts())
 
-position = None      # comment: are we currently in a trade? None = no, otherwise store entry details
-trades = []             # comment: will collect one record per completed trade
-capital_gained_per_trade = 10000
+position = None      # are we currently in a trade?
+trades = []             # will collect one record per completed trade
+capital_gained_per_trade = 10000 # pretending to add 10,000 dollars every time we invest
 
 for i in range(len(data)):
     z = data["z_score"].iloc[i]
@@ -91,3 +91,14 @@ print("Win rate:", win_rate)
 
 
 print(sum(t["profit_in_dollars"] for t in trades))
+
+first_MA = data["MA"].iloc[0]
+last_MA = data["MA"].iloc[-1]
+first_V = data["MA"].iloc[0]
+last_V = data["MA"].iloc[-1]
+
+MA_return = (last_MA - first_MA) / first_MA
+V_return = (last_V - first_V) / first_V
+
+buy_hold_profit = (MA_return * 10000) + (V_return * 10000)
+print("Buy and hold profit:", buy_hold_profit)
