@@ -48,3 +48,29 @@ data["signal"] = signals
 
 print(data["signal"].value_counts())
 
+position = None      # comment: are we currently in a trade? None = no, otherwise store entry details
+trades = []             # comment: will collect one record per completed trade
+
+for i in range(len(data)):
+    z = data["z_score"].iloc[i]
+    date = data["Date"].iloc[i]
+
+    if position is None:
+        if z > 2:
+            position = {"entry_date": date, "entry_z": z, "type": "SELL MA / BUY V"}
+        elif z < -2:
+            position = {"entry_date": date, "entry_z": z, "type": "BUY MA / SELL V"}
+    else:
+        if abs(z) < 0.5:
+            profit = abs(position["entry_z"]) - abs(z)
+            trades.append({
+                "entry_date": position["entry_date"],
+                "exit_date": date,
+                "type": position["type"],
+                "profit": profit
+            })
+            position = None
+
+print(len(trades), "trades completed")
+for t in trades:
+    print(t)
