@@ -74,3 +74,11 @@ for i in range(len(data)):
 print(len(trades), "trades completed")
 for t in trades:
     print(t)
+
+
+total_profit = sum(t["profit"] for t in trades)
+print("Total profit:", total_profit)
+
+winning_trades = [t for t in trades if t["profit"] > 0]
+win_rate = len(winning_trades) / len(trades)
+print("Win rate:", win_rate)
