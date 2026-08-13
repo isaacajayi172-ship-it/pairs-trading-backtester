@@ -57,6 +57,8 @@ capital_gained_per_trade = 10000 # pretending to add 10,000 dollars every time w
 
 # for loop to dictate what the action should be depending on the differing ratio between both MA and V each day
 
+cost_per_leg = 0.001 # 0.1% is normally charged per transaction
+
 for i in range(len(data)):
     z = data["z_score"].iloc[i]
     date = data["Date"].iloc[i]
@@ -74,20 +76,27 @@ for i in range(len(data)):
             pct_return = abs(position["entry_ratio"] - exit_ratio) / position["entry_ratio"]
             profit_in_dollars = pct_return * capital_gained_per_trade
 
+            total_cost = capital_gained_per_trade * cost_per_leg * 4
+            profit_in_dollars_after_costs = profit_in_dollars - total_cost
+
             trades.append({
                 "entry_date": position["entry_date"],
                 "exit_date": date,
                 "type": position["type"],
-                "profit_in_dollars": profit_in_dollars
+                "profit_in_dollars": profit_in_dollars,
+                "profit_in_dollars_after_costs": profit_in_dollars_after_costs,
             })
             position = None
+
+
 
 print(len(trades), "trades completed")
 for t in trades:
     print(t)
+T_profit = sum(t["profit_in_dollars_after_costs"] for t in trades)
+print("Total profit after costs:", T_profit)
 
 # calculating the profit in dollars 
-
 total_profit = sum(t["profit_in_dollars"] for t in trades)
 print("Total profit:", total_profit)
 
