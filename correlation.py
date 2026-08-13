@@ -7,6 +7,8 @@ data = pd.read_csv("clean_prices.csv")
 
 correlation = data["MA"].corr(data["V"])
 
+# if/else loop here to evaluate how strong the correlation is and whether it is negative or not
+
 if correlation > 1:
     print(correlation, "Error, value should not be greater than 1!")
 elif correlation > 0.7:
@@ -52,6 +54,9 @@ position = None      # are we currently in a trade?
 trades = []             # will collect one record per completed trade
 capital_gained_per_trade = 10000 # pretending to add 10,000 dollars every time we invest
 
+
+# for loop to dictate what the action should be depending on the differing ratio between both MA and V each day
+
 for i in range(len(data)):
     z = data["z_score"].iloc[i]
     date = data["Date"].iloc[i]
@@ -81,6 +86,7 @@ print(len(trades), "trades completed")
 for t in trades:
     print(t)
 
+# calculating the profit in dollars 
 
 total_profit = sum(t["profit_in_dollars"] for t in trades)
 print("Total profit:", total_profit)
@@ -92,13 +98,28 @@ print("Win rate:", win_rate)
 
 print(sum(t["profit_in_dollars"] for t in trades))
 
+
+# test to see if buy and holding strategy could out perform pairs strategy
+# testing for well known limitation in pairs trading
+
 first_MA = data["MA"].iloc[0]
-last_MA = data["MA"].iloc[-1]
-first_V = data["MA"].iloc[0]
-last_V = data["MA"].iloc[-1]
+last_MA = data["MA"].iloc[-1] # counting backwards
+first_V = data["V"].iloc[0]
+last_V = data["V"].iloc[-1]
 
 MA_return = (last_MA - first_MA) / first_MA
 V_return = (last_V - first_V) / first_V
 
 buy_hold_profit = (MA_return * 10000) + (V_return * 10000)
 print("Buy and hold profit:", buy_hold_profit)
+
+data["cumulative_profit"] = 0.0
+running_total = 0
+for t in trades:
+    running_total += t["profit_in_dollars"]
+    data.loc[data["Date"] == t["exit_date"], "cumulative_profit"] = running_total
+
+
+data["cumulative_profit"] = data["cumulative_profit"].replace(0, pd.NA).ffill().fillna(0)
+
+print(data[data["cumulative_profit"] != 0])
