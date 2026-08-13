@@ -123,3 +123,8 @@ for t in trades:
 data["cumulative_profit"] = data["cumulative_profit"].replace(0, pd.NA).ffill().fillna(0)
 
 print(data[data["cumulative_profit"] != 0])
+
+running_max = data["cumulative_profit"].cummax()
+drawdown = data["cumulative_profit"] - running_max
+max_drawdown = drawdown.min()
+print("Max drawdown:", max_drawdown)
