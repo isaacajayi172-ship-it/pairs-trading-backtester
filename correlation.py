@@ -128,3 +128,8 @@ running_max = data["cumulative_profit"].cummax()
 drawdown = data["cumulative_profit"] - running_max
 max_drawdown = drawdown.min()
 print("Max drawdown:", max_drawdown)
+
+data["MA_buyhold"] = 10000 * (data["MA"] / data["MA"].iloc[0])
+data["V_buyhold"] = 10000 * (data["V"] / data["V"].iloc[0])
+data["buyhold_total"] = data["MA_buyhold"] + data["V_buyhold"] - 20000
+data.to_csv("results.csv", index = False)
