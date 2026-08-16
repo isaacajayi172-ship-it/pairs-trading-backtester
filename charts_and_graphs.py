@@ -20,6 +20,7 @@ plt.ylabel("z-score")
 plt.title("MA/V price Ratio z-score over 2025")
 plt.gca().xaxis.set_major_locator(ticker.MaxNLocator(10))
 plt.xticks(rotation = 45)
+plt.savefig("z-score_chart.png")
 plt.show()
 
 
@@ -32,4 +33,5 @@ plt.title("Pairs trading strategy vs Buy and Hold")
 plt.legend()
 plt.gca().xaxis.set_major_locator(ticker.MaxNLocator(10))
 plt.xticks(rotation = 45)
+plt.savefig("comparison_chart.png")
 plt.show()
